@@ -32,17 +32,22 @@ function showAllValue(){
     while (elShowData.firstChild != null){
         elShowData.removeChild(elShowData.firstChild);
     }
+    console.log(localStorage);
+    const dishDB = getDB();
     // Add a p tag for each value in local storage
-    for(let i=0; i < localStorage.length; i++){
+    for(let i=0; i<dishDB.length; i++){
         let pTag = document.createElement("p");
-        pTag.textContent = i + 1 + ". " + localStorage.getItem(i);
+        pTag.textContent = i + 1 + ". " + dishDB[i];
         elShowData.appendChild(pTag);
+    
     }
 }
 
 function addData(){
     if (elInputData.value != ""){
-        localStorage.setItem(localStorage.length, elInputData.value);
+        const dishDB = getDB();
+        dishDB.push(elInputData.value);
+        saveDB(dishDB);
         elInputData.value = "";
         showAllValue();
     }
@@ -52,12 +57,13 @@ function genDishList(){
     elDishList.textContent = "Your dish list is ";
     let maxDays = elNbDays.value != "" ? elNbDays.value : 7;
     let dishListIndex = [];
+    const dishDB = getDB();
     for(let i=0; i<maxDays ; i++){
         let Duplicate;
         let randomIndex;
         do{
             Duplicate = false;
-            randomIndex = Math.floor(Math.random() * localStorage.length);
+            randomIndex = Math.floor(Math.random() * dishDB.length);
             for(let j=0; j<dishListIndex.length; j++){
                 if(randomIndex === dishListIndex[j]){
                     console.log("duplicate");
@@ -69,17 +75,33 @@ function genDishList(){
         dishListIndex.push(randomIndex);
     }
     for (let i=0; i<dishListIndex.length; i++){
-        let msg = i === dishListIndex.length - 1 ? localStorage.getItem(dishListIndex[i]) : localStorage.getItem(dishListIndex[i]) + ", "; 
+        let msg = i === dishListIndex.length - 1 ? dishDB[dishListIndex[i]] : dishDB[dishListIndex[i]] + ", "; 
         elDishList.textContent += msg;
     }
 }
 
 function removeDish(){
-    if (elInputRmData.value != "" && elInputRmData.value <= localStorage.length){
-        localStorage.removeItem(elInputRmData.value - 1);
+    const dishDB = getDB();
+    if (elInputRmData.value != "" && elInputRmData.value <= dishDB.length){     
+        console.log(dishDB);
+        dishDB.splice(elInputRmData.value - 1, 1);
+        saveDB(dishDB);
     }
     elInputRmData.value = "";
     showAllValue();
+}
+
+function getDB(){
+    let db = localStorage.getItem("dishDB");
+    if (db === null){
+        db = JSON.stringify([]);
+        localStorage.setItem("dishDB", db);
+    }
+    return JSON.parse(db);
+}
+
+function saveDB(db){
+    localStorage.setItem("dishDB", JSON.stringify(db));
 }
 
 showAllValue();

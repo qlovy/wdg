@@ -32,7 +32,6 @@ function showAllValue(){
     while (elShowData.firstChild != null){
         elShowData.removeChild(elShowData.firstChild);
     }
-    console.log(localStorage);
     const dishDB = getDB();
     // Add a p tag for each value in local storage
     for(let i=0; i<dishDB.length; i++){
